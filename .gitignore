@@ -1,0 +1,22 @@
+# OS-specific
+.DS_Store
+
+# Editor files
+.#*
+[#]*#
+*~
+*$
+*.bak
+*.kdev4
+.project
+.pydevproject
+.vscode
+*.swp
+.idea
+
+# Python files
+*.egg-info
+.cache
+build
+dist
+MANIFEST
