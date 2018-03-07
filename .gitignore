@@ -7,14 +7,12 @@
 *~
 *$
 *.bak
-*.kdev4
 .project
-.pydevproject
 .vscode
 *.swp
-.idea
 
 # Python files
+*.py[cod]
 *.egg-info
 .cache
 build
