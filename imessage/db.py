@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 import datetime
-import os.path as op
-import sqlite3
+
+from .util import get_db_conn
 
 OSX_EPOCH = 978307200
 
@@ -60,20 +60,13 @@ class Message(object):
         return 'Text: ' + str(self.text) + ' Date: ' + str(self.date)
 
 
-def _new_connection():
-    # The current logged-in user's Messages sqlite database is found at:
-    # ~/Library/Messages/chat.db
-    db_path = op.join(op.expanduser('~'), 'Library', 'Messages', 'chat.db')
-    return sqlite3.connect(db_path)
-
-
 def get_all_recipients():
     """ Fetches all known recipients.
 
     The `id`s of the recipients fetched can be used to fetch all messages
     exchanged with a given recipient.
     """
-    connection = _new_connection()
+    connection = get_db_conn()
 
     with connection:
         c = connection.cursor()
@@ -89,7 +82,7 @@ def get_all_recipients():
 
 def get_messages_for_recipient(recipient):
     """ Fetches all messages exchanged with a given recipient. """
-    connection = _new_connection()
+    connection = get_db_conn()
 
     with connection:
         c = connection.cursor()
