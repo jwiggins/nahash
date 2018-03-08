@@ -22,6 +22,7 @@
 
 import datetime
 
+from .tables import MESSAGE_DATE, MESSAGE_TEXT
 from .util import get_db_conn
 
 OSX_EPOCH = 978307200
@@ -91,10 +92,12 @@ def get_messages_for_recipient(recipient):
         c.execute('SELECT * FROM `message` WHERE handle_id=' + str(recipient))
         messages = []
         for row in c:
-            text = row[2]
+            text = row[MESSAGE_TEXT]
             if text is None:
                 continue
-            date = datetime.datetime.fromtimestamp(row[15] + OSX_EPOCH)
+
+            im_date = row[MESSAGE_DATE]
+            date = datetime.datetime.fromtimestamp(im_date + OSX_EPOCH)
 
             # Strip any special non-ASCII characters (e.g., the special
             # character that is used as a placeholder for attachments such as
