@@ -20,12 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import datetime
-
-from .tables import MESSAGE_DATE, MESSAGE_TEXT
 from .util import get_db_conn
-
-OSX_EPOCH = 978307200
 
 
 class Recipient(object):
@@ -46,21 +41,6 @@ class Recipient(object):
                 ' Phone or email: ' + self.phone_or_email)
 
 
-class Message(object):
-    """ Represents an iMessage message.
-
-    Each message has:
-    - a `text` property that holds the text contents of the message
-    - a `date` property that holds the delivery date of the message
-    """
-    def __init__(self, text, date):
-        self.text = text
-        self.date = date
-
-    def __repr__(self):
-        return 'Text: ' + str(self.text) + ' Date: ' + str(self.date)
-
-
 def get_all_recipients():
     """ Fetches all known recipients.
 
@@ -79,30 +59,3 @@ def get_all_recipients():
             recipients.append(Recipient(row[0], row[1]))
 
     return recipients
-
-
-def get_messages_for_recipient(recipient):
-    """ Fetches all messages exchanged with a given recipient. """
-    connection = get_db_conn()
-
-    with connection:
-        c = connection.cursor()
-
-        # The `message` table stores all exchanged iMessages.
-        c.execute('SELECT * FROM `message` WHERE handle_id=' + str(recipient))
-        messages = []
-        for row in c:
-            text = row[MESSAGE_TEXT]
-            if text is None:
-                continue
-
-            im_date = row[MESSAGE_DATE]
-            date = datetime.datetime.fromtimestamp(im_date + OSX_EPOCH)
-
-            # Strip any special non-ASCII characters (e.g., the special
-            # character that is used as a placeholder for attachments such as
-            # files or images).
-            encoded_text = text.encode('ascii', 'ignore')
-            messages.append(Message(encoded_text, date))
-
-    return messages
