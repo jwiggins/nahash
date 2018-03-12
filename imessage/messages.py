@@ -2,7 +2,7 @@ import subprocess
 import textwrap
 import time
 
-from .tables import MESSAGE_ROWID, MESSAGE_TEXT
+from .tables import MESSAGE_HANDLE_ID, MESSAGE_ROWID, MESSAGE_TEXT
 from .util import get_db_conn
 
 WAIT_TIMEOUT = 5.0
@@ -26,14 +26,17 @@ def send_message(recipient, text):
     return proc.wait()
 
 
-def wait_for_next_message(recipients):
+def wait_for_next_message(recipients, last_rowid=0):
     """ Poll forever until a message arrives from any of `recipients`.
     """
     if not isinstance(recipients, (list, tuple)):
         recipients = (recipients,)
 
+    # Turn recipients into a dictionary
+    recipients = {r.index: r for r in recipients}
+
     condition = 'is_from_me=0 AND handle_id IN ( {} )'
-    condition = condition.format(', '.join(str(r.index) for r in recipients))
+    condition = condition.format(', '.join(recipients.keys()))
     sql = ('SELECT * FROM `message` '
            'WHERE ' + condition +
            'ORDER BY ROWID DESC '
@@ -42,7 +45,6 @@ def wait_for_next_message(recipients):
     connection = get_db_conn()
     with connection:
         c = connection.cursor()
-        last_rowid = 0
 
         while True:
             time.sleep(WAIT_TIMEOUT)
@@ -57,4 +59,6 @@ def wait_for_next_message(recipients):
             if last_rowid == 0:
                 last_rowid = row[MESSAGE_ROWID]
             elif row[MESSAGE_ROWID] > last_rowid:
-                return row[MESSAGE_TEXT]
+                r_index = row[MESSAGE_HANDLE_ID]
+                row_id = row[MESSAGE_ROWID]
+                return row[MESSAGE_TEXT], recipients[r_index], row_id
