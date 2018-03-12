@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from .tables import RECIPIENTS_ID, RECIPIENTS_ROWID, RECIPIENTS_SERVICE_ID
 from .util import get_db_conn
 
 
@@ -27,18 +28,21 @@ class Recipient(object):
     """ Represents a user that iMessages can be exchanged with.
 
     Each user has...
-    - an `id` property that uniquely identifies him or her in the Messages
+    - an `index` property that uniquely identifies him or her in the Messages
       database
     - a `phone_or_email` property that is either the user's phone number or
       iMessage-enabled email address
+    - a `service` property that is the service type associated with the
+      recipient
     """
-    def __init__(self, _id, phone_or_email):
-        self.id = _id
+    def __init__(self, index, phone_or_email, service):
+        self.index = index
         self.phone_or_email = phone_or_email
+        self.service = service
 
     def __repr__(self):
-        return ('ID: ' + str(self.id) +
-                ' Phone or email: ' + self.phone_or_email)
+        return 'ID: {} Phone or email: {} ({})'.format(
+            self.index, self.phone_or_email, self.service)
 
 
 def get_all_recipients():
@@ -56,6 +60,8 @@ def get_all_recipients():
         c.execute('SELECT * FROM `handle`')
         recipients = []
         for row in c:
-            recipients.append(Recipient(row[0], row[1]))
+            recipients.append(Recipient(row[RECIPIENTS_ROWID],
+                                        row[RECIPIENTS_ID],
+                                        row[RECIPIENTS_SERVICE_ID]))
 
     return recipients

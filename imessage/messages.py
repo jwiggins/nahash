@@ -20,7 +20,7 @@ def send_message(recipient, text):
         end tell
     end run
     """)
-    command = ['osascript', '-', recipient, text]
+    command = ['osascript', '-', recipient.phone_or_email, text]
     proc = subprocess.Popen(command, stdin=subprocess.PIPE)
     proc.communicate(script.encode('utf8'))
     return proc.wait()
@@ -33,7 +33,7 @@ def wait_for_next_message(recipients):
         recipients = (recipients,)
 
     condition = 'is_from_me=0 AND handle_id IN ( {} )'
-    condition = condition.format(', '.join(str(r) for r in recipients))
+    condition = condition.format(', '.join(str(r.index) for r in recipients))
     sql = ('SELECT * FROM `message` '
            'WHERE ' + condition +
            'ORDER BY ROWID DESC '
