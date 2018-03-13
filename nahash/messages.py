@@ -10,6 +10,8 @@ WAIT_TIMEOUT = 5.0
 
 def send_message(recipient, text):
     """ Send a single message to a recipient
+
+    Original: https://gist.github.com/tk512/9b578739730eb5b83c7cbf502c38cf3a
     """
     script = textwrap.dedent("""
     on run {targetBuddyPhone, targetMessage}
