@@ -38,7 +38,7 @@ def wait_for_next_message(recipients, last_rowid=0):
     recipients = {r.index: r for r in recipients}
 
     condition = 'is_from_me=0 AND handle_id IN ( {} )'
-    condition = condition.format(', '.join(recipients.keys()))
+    condition = condition.format(', '.join(map(str, recipients.keys())))
     sql = ('SELECT * FROM `message` '
            'WHERE ' + condition +
            'ORDER BY ROWID DESC '
