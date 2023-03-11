@@ -36,13 +36,13 @@ def wait_for_next_message(recipients, last_rowid=0):
 
     # Turn recipients into a dictionary
     recipients = {r.index: r for r in recipients}
+    recipient_keys = ', '.join(map(str, recipients.keys()))
 
-    condition = 'is_from_me=0 AND handle_id IN ( {} )'
-    condition = condition.format(', '.join(map(str, recipients.keys())))
-    sql = ('SELECT * FROM `message` '
-           'WHERE ' + condition +
-           'ORDER BY ROWID DESC '
-           'LIMIT 1')
+    condition = f'is_from_me=0 AND handle_id IN ( {recipient_keys} )'
+    sql = (
+        f'SELECT * FROM `message` WHERE {condition} '
+        'ORDER BY ROWID DESC LIMIT 1'
+    )
 
     connection = get_db_conn()
     with connection:

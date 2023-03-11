@@ -1,20 +1,6 @@
-# OS-specific
-.DS_Store
-
-# Editor files
-.#*
-[#]*#
-*~
-*$
-*.bak
-.project
-.vscode
-*.swp
-
-# Python files
 *.py[cod]
 *.egg-info
-.cache
+__pycache__
 build
 dist
 MANIFEST
